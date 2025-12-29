@@ -38,7 +38,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
                 {/* Quick Add Button Overlay */}
                 <button
                     onClick={handleAddToCart}
-                    className="absolute bottom-3 right-3 p-3 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500"
+                    className="absolute bottom-3 right-3 p-3 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-full shadow-lg md:opacity-0 md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 active:scale-90"
                     aria-label="Add to cart"
                 >
                     <ShoppingCart className="w-5 h-5" />

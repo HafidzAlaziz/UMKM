@@ -23,6 +23,15 @@ export function Navbar({ onCartClick }: NavbarProps) {
     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         setIsMenuOpen(false); // Always close menu
 
+        // Handle root link scroll to top
+        if (href === "/") {
+            if (pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            return;
+        }
+
         // Check if it's a hash link
         if (href.includes("#")) {
             const [path, hash] = href.split("#");
@@ -61,10 +70,23 @@ export function Navbar({ onCartClick }: NavbarProps) {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
-                        <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                        <Link
+                            href="/"
+                            onClick={(e) => handleScroll(e, "/")}
+                            className={cn(
+                                "font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400",
+                                pathname === "/" ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"
+                            )}
+                        >
                             Beranda
                         </Link>
-                        <Link href="/products" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                        <Link
+                            href="/products"
+                            className={cn(
+                                "font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400",
+                                pathname === "/products" ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"
+                            )}
+                        >
                             Produk
                         </Link>
                         <Link
@@ -116,14 +138,20 @@ export function Navbar({ onCartClick }: NavbarProps) {
                     <div className="px-4 py-3 space-y-3">
                         <Link
                             href="/"
-                            className="block text-gray-600 dark:text-gray-300 font-medium hover:text-blue-600 dark:hover:text-blue-400"
-                            onClick={() => setIsMenuOpen(false)}
+                            className={cn(
+                                "block font-medium hover:text-blue-600 dark:hover:text-blue-400",
+                                pathname === "/" ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"
+                            )}
+                            onClick={(e) => handleScroll(e, "/")}
                         >
                             Beranda
                         </Link>
                         <Link
                             href="/products"
-                            className="block text-gray-600 dark:text-gray-300 font-medium hover:text-blue-600 dark:hover:text-blue-400"
+                            className={cn(
+                                "block font-medium hover:text-blue-600 dark:hover:text-blue-400",
+                                pathname === "/products" ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-300"
+                            )}
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Produk
