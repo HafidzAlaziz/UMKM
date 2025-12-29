@@ -1,11 +1,11 @@
 "use client";
 
 import { useCartStore } from "@/store/useCartStore";
-import { MessageCircle, Copy, Image as ImageIcon, Check, Share2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState, useCallback, useEffect } from "react";
+import { MessageCircle, Download, Copy, Image as ImageIcon, Check } from "lucide-react";
+import { cn, formatRupiah } from "@/lib/utils";
+import { useState, useCallback } from "react";
 import { OrderImageCanvas } from "./OrderImageCanvas";
-import { formatOrderData, copyImageToClipboard, shareImage } from "@/lib/orderImageUtils";
+import { formatOrderData, downloadImage, copyImageToClipboard } from "@/lib/orderImageUtils";
 
 interface WhatsAppCheckoutProps {
     shippingCost: number;
@@ -17,57 +17,39 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
     const [showImageGenerator, setShowImageGenerator] = useState(false);
     const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
     const [isCopied, setIsCopied] = useState(false);
-    const [isCopying, setIsCopying] = useState(false);
-    const [isSharing, setIsSharing] = useState(false);
-    const [canShare, setCanShare] = useState(false);
+    const [isDownloaded, setIsDownloaded] = useState(false);
 
     const isDisabled = shippingCost <= 0;
     const finalDestination = destination || "Konfirmasi Admin";
 
     const orderData = formatOrderData(items, totalPrice(), shippingCost, finalDestination);
 
-    useEffect(() => {
-        // Check if Web Share API is available
-        setCanShare(!!navigator.share && !!navigator.canShare);
-    }, []);
-
     const handleCanvasReady = useCallback((canvas: HTMLCanvasElement) => {
         setCanvasElement(canvas);
     }, []);
 
-    const handleCopyImage = async () => {
+    const handleDownload = () => {
         if (!canvasElement) return;
+        downloadImage(canvasElement, orderData.orderId);
+        setIsDownloaded(true);
+        setTimeout(() => setIsDownloaded(false), 3000);
+    };
 
-        setIsCopying(true);
+    const handleCopy = async () => {
+        if (!canvasElement) return;
         const success = await copyImageToClipboard(canvasElement);
-
         if (success) {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 3000);
-        } else {
-            alert('Gagal copy gambar. Silakan coba lagi atau gunakan browser yang mendukung.');
         }
-        setIsCopying(false);
-    };
-
-    const handleShareImage = async () => {
-        if (!canvasElement) return;
-
-        setIsSharing(true);
-        const success = await shareImage(canvasElement, orderData.orderId);
-
-        if (!success) {
-            alert('Gagal share gambar. Silakan gunakan tombol Copy atau Download.');
-        }
-        setIsSharing(false);
     };
 
     const handleOpenWhatsApp = () => {
         const message = `🛒 *PESANAN BARU - UMKM STORE*\n\n` +
             `Order ID: ${orderData.orderId}\n` +
-            `Total: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(orderData.grandTotal)}\n\n` +
-            `Saya sudah ${canShare ? 'share' : 'copy'} invoice pesanan.\n` +
-            `Berikut saya kirimkan invoice dan alamat lengkap saya.`;
+            `Total Tagihan: ${formatRupiah(orderData.grandTotal)}\n\n` +
+            `Halo Admin, saya sudah download invoice pesanan.\n` +
+            `Berikut saya kirimkan gambarnya dan alamat lengkap saya:`;
 
         const phone = "62895613114028";
         const link = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
@@ -79,10 +61,7 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
             <div className="space-y-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                     <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">
-                        {canShare
-                            ? "📸 Invoice siap! Klik 'Share' untuk langsung kirim ke WhatsApp."
-                            : "📸 Invoice siap! Copy gambar lalu paste di WhatsApp."
-                        }
+                        📸 Invoice siap! Silakan download gambar, lalu kirimkan ke WhatsApp Admin.
                     </p>
                 </div>
 
@@ -90,60 +69,44 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
                     <OrderImageCanvas orderData={orderData} onCanvasReady={handleCanvasReady} />
                 </div>
 
-                {/* Share Button (Mobile) */}
-                {canShare && (
+                <div className="grid grid-cols-2 gap-3">
                     <button
-                        onClick={handleShareImage}
-                        disabled={!canvasElement || isSharing}
-                        className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 active:scale-95"
-                    >
-                        <Share2 className="w-5 h-5" />
-                        {isSharing ? 'Sharing...' : 'Share Invoice ke WhatsApp'}
-                    </button>
-                )}
-
-                {/* Copy Button (Desktop fallback) */}
-                {!canShare && (
-                    <button
-                        onClick={handleCopyImage}
-                        disabled={!canvasElement || isCopying}
+                        onClick={handleDownload}
+                        disabled={!canvasElement}
                         className={cn(
-                            "w-full py-3 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95",
-                            isCopied
-                                ? "bg-green-600 hover:bg-green-700"
-                                : "bg-blue-600 hover:bg-blue-700"
+                            "py-3 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95",
+                            isDownloaded ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
                         )}
                     >
-                        {isCopied ? (
-                            <>
-                                <Check className="w-5 h-5" />
-                                Gambar Ter-copy!
-                            </>
-                        ) : (
-                            <>
-                                <Copy className="w-5 h-5" />
-                                {isCopying ? 'Copying...' : 'Copy Invoice ke Clipboard'}
-                            </>
-                        )}
+                        {isDownloaded ? <Check className="w-5 h-5" /> : <Download className="w-5 h-5" />}
+                        {isDownloaded ? "Selesai!" : "Download"}
                     </button>
-                )}
-
-                {/* WhatsApp Button (for desktop users who copied) */}
-                {!canShare && (
                     <button
-                        onClick={handleOpenWhatsApp}
-                        className="w-full py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg hover:bg-green-600 transition-all flex items-center justify-center gap-2 active:scale-95"
+                        onClick={handleCopy}
+                        disabled={!canvasElement}
+                        className={cn(
+                            "py-3 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95",
+                            isCopied ? "bg-green-600" : "bg-gray-600 hover:bg-gray-700"
+                        )}
                     >
-                        <MessageCircle className="w-5 h-5" />
-                        Buka WhatsApp
+                        {isCopied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                        {isCopied ? "Ter-copy!" : "Copy Image"}
                     </button>
-                )}
+                </div>
+
+                <button
+                    onClick={handleOpenWhatsApp}
+                    className="w-full py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg hover:bg-green-600 transition-all flex items-center justify-center gap-2 active:scale-95"
+                >
+                    <MessageCircle className="w-5 h-5" />
+                    Buka WhatsApp Admin
+                </button>
 
                 <button
                     onClick={() => setShowImageGenerator(false)}
                     className="w-full py-2 text-gray-600 dark:text-gray-400 text-sm hover:text-gray-800 dark:hover:text-gray-200"
                 >
-                    ← Kembali
+                    ← Kembali ke Detail Keranjang
                 </button>
             </div>
         );
@@ -167,7 +130,7 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
                 )}
             >
                 <ImageIcon className="w-5 h-5" />
-                Generate Invoice & Checkout
+                Buat Invoice & Checkout
             </button>
         </div>
     );
