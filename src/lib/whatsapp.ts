@@ -8,7 +8,7 @@ export const generateWhatsAppLink = (
     destination: string,
     customerName: string = "Pelanggan"
 ) => {
-    const phone = "6289512345678"; // Replace with actual shop number
+    const phone = "6289561311402"; // UMKM Store WhatsApp
     const grandTotal = totalPrice + shippingCost;
 
     let message = `Halo Admin, saya ingin memesan:\n\n`;
