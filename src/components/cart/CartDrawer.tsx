@@ -139,7 +139,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                 {/* Footer */}
                 {items.length > 0 && (
-                    <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 space-y-4">
+                    <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 space-y-4 shrink-0">
                         {/* Shipping Simulator */}
                         <ShippingSimulator onShippingCalculated={handleShippingCalculated} />
 

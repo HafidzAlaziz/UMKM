@@ -51,11 +51,11 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
             <div className="space-y-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-800">
                     <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">
-                        📸 Invoice pesanan Anda siap! Download gambar di bawah ini.
+                        📸 Invoice pesanan Anda siap! Scroll ke bawah untuk lihat semua detail, lalu download.
                     </p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto">
                     <OrderImageCanvas orderData={orderData} onCanvasReady={handleCanvasReady} />
                 </div>
 
