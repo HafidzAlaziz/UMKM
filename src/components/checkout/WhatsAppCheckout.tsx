@@ -55,7 +55,7 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
                     </p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto scrollbar-custom">
                     <OrderImageCanvas orderData={orderData} onCanvasReady={handleCanvasReady} />
                 </div>
 
