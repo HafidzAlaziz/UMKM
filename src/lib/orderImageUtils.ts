@@ -44,6 +44,42 @@ export const copyImageToClipboard = async (canvas: HTMLCanvasElement): Promise<b
     }
 };
 
+export const shareImage = async (canvas: HTMLCanvasElement, orderId: string): Promise<boolean> => {
+    try {
+        // Check if Web Share API is supported
+        if (!navigator.share || !navigator.canShare) {
+            return false;
+        }
+
+        const blob = await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob(resolve, 'image/png');
+        });
+
+        if (!blob) {
+            throw new Error('Failed to create blob from canvas');
+        }
+
+        const file = new File([blob], `${orderId}.png`, { type: 'image/png' });
+
+        // Check if we can share files
+        if (!navigator.canShare({ files: [file] })) {
+            return false;
+        }
+
+        await navigator.share({
+            files: [file],
+            title: 'Invoice Pesanan - UMKM Store',
+            text: `Invoice pesanan ${orderId}`
+        });
+
+        return true;
+    } catch (error) {
+        // User cancelled or error occurred
+        console.error('Failed to share image:', error);
+        return false;
+    }
+};
+
 export interface OrderData {
     orderId: string;
     items: CartItem[];
