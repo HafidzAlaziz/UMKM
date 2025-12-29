@@ -48,7 +48,8 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
         const message = `🛒 *PESANAN BARU - UMKM STORE*\n\n` +
             `Order ID: ${orderData.orderId}\n` +
             `Total Tagihan: ${formatRupiah(orderData.grandTotal)}\n\n` +
-            `Halo Admin, saya sudah download invoice pesanan.\n` +
+            `Halo Admin, saya ingin memesan produk.\n` +
+            `Saya sudah download invoice pesanan.\n` +
             `Berikut saya kirimkan gambarnya dan alamat lengkap saya:`;
 
         const phone = "62895613114028";
@@ -79,7 +80,7 @@ export function WhatsAppCheckout({ shippingCost, destination }: WhatsAppCheckout
                         )}
                     >
                         {isDownloaded ? <Check className="w-5 h-5" /> : <Download className="w-5 h-5" />}
-                        {isDownloaded ? "Selesai!" : "Download"}
+                        {isDownloaded ? "Berhasil!" : "Download"}
                     </button>
                     <button
                         onClick={handleCopy}
