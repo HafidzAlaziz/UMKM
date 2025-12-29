@@ -21,6 +21,29 @@ export const downloadImage = (canvas: HTMLCanvasElement, orderId: string) => {
     }, 'image/png');
 };
 
+export const copyImageToClipboard = async (canvas: HTMLCanvasElement): Promise<boolean> => {
+    try {
+        const blob = await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob(resolve, 'image/png');
+        });
+
+        if (!blob) {
+            throw new Error('Failed to create blob from canvas');
+        }
+
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                'image/png': blob
+            })
+        ]);
+
+        return true;
+    } catch (error) {
+        console.error('Failed to copy image to clipboard:', error);
+        return false;
+    }
+};
+
 export interface OrderData {
     orderId: string;
     items: CartItem[];
